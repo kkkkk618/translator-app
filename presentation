@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能翻译系统 - PPT展示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; }
+        .slide-container { display: flex; height: 100vh; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .slide { flex: 0 0 100vw; height: 100vh; scroll-snap-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: white; position: relative; }
+        .slide:nth-child(even) { background: #f8f9fa; }
+        .slide h1 { font-size: 2.5rem; color: #667eea; margin-bottom: 30px; text-align: center; }
+        .slide h2 { font-size: 2rem; color: #333; margin-bottom: 25px; text-align: center; }
+        .slide h3 { font-size: 1.5rem; color: #667eea; margin-bottom: 20px; }
+        .slide p { font-size: 1.1rem; color: #666; line-height: 1.8; text-align: center; max-width: 800px; margin-bottom: 20px; }
+        .slide ul { list-style: none; padding: 0; max-width: 700px; }
+        .slide li { font-size: 1.1rem; color: #555; padding: 15px 20px; background: #e3f2fd; margin-bottom: 10px; border-radius: 10px; border-left: 5px solid #667eea; }
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 900px; margin-top: 30px; }
+        .feature-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 15px; color: white; text-align: center; transition: transform 0.3s ease; }
+        .feature-card:hover { transform: translateY(-10px); }
+        .feature-card i { font-size: 3rem; margin-bottom: 15px; }
+        .feature-card h4 { font-size: 1.3rem; margin-bottom: 10px; }
+        .feature-card p { color: rgba(255,255,255,0.9); font-size: 0.95rem; }
+        .architecture-diagram { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 30px; }
+        .arch-box { padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; font-size: 1.1rem; font-weight: 600; text-align: center; }
+        .arch-arrow { font-size: 2rem; color: #667eea; }
+        .tech-stack { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 30px; }
+        .tech-tag { padding: 12px 25px; background: #e3f2fd; color: #1976d2; border-radius: 30px; font-size: 1rem; font-weight: 600; }
+        .screenshot { max-width: 80%; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); margin-top: 20px; }
+        .stats-row { display: flex; gap: 40px; margin-top: 30px; }
+        .stat-box { text-align: center; padding: 30px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; }
+        .stat-box .number { font-size: 3rem; font-weight: bold; }
+        .stat-box .label { font-size: 0.95rem; margin-top: 5px; opacity: 0.9; }
+        .api-info { background: #e8f5e9; padding: 20px; border-radius: 15px; border-left: 5px solid #4caf50; max-width: 700px; margin-top: 20px; }
+        .api-info code { display: block; background: white; padding: 15px; border-radius: 8px; margin-top: 10px; overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.9rem; color: #333; }
+        .corpus-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 800px; margin-top: 20px; }
+        .corpus-item { background: #fff3e0; padding: 15px; border-radius: 10px; text-align: center; border-left: 4px solid #ff9800; }
+        .corpus-item .cat { font-size: 0.8rem; color: #ff9800; font-weight: 600; }
+        .corpus-item .text { font-size: 0.9rem; color: #555; margin-top: 5px; }
+        .subtitle-demo { background: #2d2d2d; padding: 40px 60px; border-radius: 15px; color: white; text-align: center; margin-top: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .subtitle-demo .original { color: #ffd54f; font-size: 1.5rem; margin-bottom: 15px; }
+        .subtitle-demo .translated { color: #4dd0e1; font-size: 1.3rem; }
+        .nav-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
+        .nav-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: rgba(255,255,255,0.9); color: #667eea; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+        .nav-btn:hover { transform: scale(1.1); background: white; }
+        .slide-indicator { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; z-index: 100; }
+        .title-slide { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .title-slide h1 { color: white; font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .title-slide p { color: rgba(255,255,255,0.9); font-size: 1.3rem; }
+        .title-slide .subtitle { margin-top: 20px; font-size: 1.1rem; opacity: 0.8; }
+        @media (max-width: 768px) { .slide h1 { font-size: 1.8rem; } .slide h2 { font-size: 1.5rem; } .features-grid { grid-template-columns: 1fr; } .corpus-grid { grid-template-columns: 1fr; } .stats-row { flex-direction: column; gap: 15px; } .screenshot { max-width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="slide-container" id="slideContainer">
+        <div class="slide title-slide">
+            <h1>🌐 智能翻译系统</h1>
+            <p>Intelligent Translation System</p>
+            <p class="subtitle">期末考核项目 · VibeCoding开发</p>
+            <div style="margin-top: 60px; display: flex; gap: 30px;">
+                <div style="text-align: center;"><div style="font-size: 2.5rem;">🎯</div><div style="margin-top: 10px;">精准翻译</div></div>
+                <div style="text-align: center;"><div style="font-size: 2.5rem;">💾</div><div style="margin-top: 10px;">翻译记忆</div></div>
+                <div style="text-align: center;"><div style="font-size: 2.5rem;">📚</div><div style="margin-top: 10px;">语料库</div></div>
+                <div style="text-align: center;"><div style="font-size: 2.5rem;">🎤</div><div style="margin-top: 10px;">实时字幕</div></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>📝 设计思路</h2>
+            <p>基于Web技术栈构建的轻量级翻译系统，无需后端服务器，纯前端实现，便于部署和使用。</p>
+            <div class="architecture-diagram">
+                <div class="arch-box">用户界面 (HTML/CSS)</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-box">业务逻辑 (JavaScript)</div>
+                <div class="arch-arrow">↓</div>
+                <div style="display: flex; gap: 20px;">
+                    <div class="arch-box">翻译API<br>Google Translate</div>
+                    <div class="arch-box">本地存储<br>IndexedDB</div>
+                    <div class="arch-box">语音识别<br>Web Speech API</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>🛠️ 技术栈</h2>
+            <div class="tech-stack">
+                <span class="tech-tag">HTML5</span>
+                <span class="tech-tag">CSS3</span>
+                <span class="tech-tag">JavaScript ES6+</span>
+                <span class="tech-tag">IndexedDB</span>
+                <span class="tech-tag">Web Speech API</span>
+                <span class="tech-tag">Google Translate API</span>
+            </div>
+            <p style="margin-top: 30px;">采用单页应用架构，所有功能集成在一个HTML文件中，便于部署和维护。</p>
+        </div>
+
+        <div class="slide">
+            <h2>✨ 功能介绍</h2>
+            <div class="features-grid">
+                <div class="feature-card"><i>🎯</i><h4>文本翻译</h4><p>支持8种主流语言互译，基于Google Translate API，翻译质量高</p></div>
+                <div class="feature-card"><i>💾</i><h4>翻译记忆库</h4><p>自动保存翻译历史，重复内容快速匹配，提高翻译效率</p></div>
+                <div class="feature-card"><i>📚</i><h4>语料库</h4><p>内置25条多领域双语语料，涵盖商务、科技、旅游等领域</p></div>
+                <div class="feature-card"><i>🎤</i><h4>实时字幕</h4><p>语音识别实时翻译，支持会议、演讲等场景的双语字幕</p></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>📊 文本翻译模块</h2>
+            <ul style="margin-top: 30px;">
+                <li>支持英语、中文、日语、韩语、法语、德语、西班牙语、俄语</li>
+                <li>语言一键互换，操作便捷</li>
+                <li>智能检测重复翻译，优先使用记忆库</li>
+                <li>翻译结果自动保存到记忆库</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>💾 翻译记忆库</h2>
+            <div class="stats-row">
+                <div class="stat-box"><div class="number">∞</div><div class="label">存储容量</div></div>
+                <div class="stat-box"><div class="number">0.3s</div><div class="label">检索速度</div></div>
+                <div class="stat-box"><div class="number">100%</div><div class="label">本地存储</div></div>
+            </div>
+            <ul style="margin-top: 30px;">
+                <li>使用IndexedDB本地数据库存储翻译记录</li>
+                <li>支持关键词搜索，快速定位历史翻译</li>
+                <li>一键复制翻译结果，方便分享</li>
+                <li>支持恢复历史翻译到输入框</li>
+                <li>统计翻译次数和记忆匹配次数</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>📚 语料库</h2>
+            <div class="corpus-grid">
+                <div class="corpus-item"><div class="cat">商务</div><div class="text">Partnership</div><div class="text" style="color: #667eea;">合作伙伴关系</div></div>
+                <div class="corpus-item"><div class="cat">科技</div><div class="text">AI</div><div class="text" style="color: #667eea;">人工智能</div></div>
+                <div class="corpus-item"><div class="cat">旅游</div><div class="text">Complimentary</div><div class="text" style="color: #667eea;">免费的</div></div>
+            </div>
+            <p style="margin-top: 30px;">语料库包含25条双语对照文本，涵盖商务、科技、旅游、文化、教育、医疗、法律、金融、环保等9个领域。</p>
+            <ul>
+                <li>支持关键词搜索语料</li>
+                <li>点击语料卡片可直接填充到翻译区</li>
+                <li>提供翻译参考，提高翻译准确性</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>🎤 实时字幕</h2>
+            <div class="subtitle-demo">
+                <div class="original">Hello, welcome to the presentation.</div>
+                <div class="translated">你好，欢迎来到演示会。</div>
+            </div>
+            <ul style="margin-top: 30px;">
+                <li>基于Web Speech API实现语音识别</li>
+                <li>支持中文和英语的实时翻译</li>
+                <li>实时显示原文和译文双语字幕</li>
+                <li>适用于会议、演讲、直播等场景</li>
+                <li>无需安装插件，浏览器原生支持</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>🔌 API接口</h2>
+            <div class="api-info">
+                <strong>使用Google Translate API</strong>
+                <p>免费提供基础翻译服务，无需申请API Key</p>
+                <code>GET https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh&dt=t&q=Hello</code>
+            </div>
+            <div class="api-info" style="background: #f3e5f5; border-color: #9c27b0; margin-top: 20px;">
+                <strong>API参数说明</strong>
+                <ul style="text-align: left; margin-top: 10px;">
+                    <li><code>sl</code>: 源语言代码 (en/zh/ja/ko/fr/de/es/ru)</li>
+                    <li><code>tl</code>: 目标语言代码</li>
+                    <li><code>q</code>: 要翻译的文本</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>🚀 部署方式</h2>
+            <ul>
+                <li><strong>GitHub Pages</strong>: 直接部署到GitHub，免费托管</li>
+                <li><strong>Vercel/Netlify</strong>: 一键部署，自动SSL</li>
+                <li><strong>本地部署</strong>: 使用Python或Node.js启动HTTP服务器</li>
+                <li><strong>自定义域名</strong>: 支持绑定个人域名</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>📈 项目特色</h2>
+            <ul>
+                <li>纯前端实现，无需后端服务器</li>
+                <li>响应式设计，支持移动端访问</li>
+                <li>现代化UI设计，美观易用</li>
+                <li>数据本地存储，保护用户隐私</li>
+                <li>功能完整，涵盖翻译全流程</li>
+                <li>代码结构清晰，易于扩展</li>
+            </ul>
+            <div style="margin-top: 40px; text-align: center;">
+                <h3>感谢观看！</h3>
+                <p style="margin-top: 10px;">智能翻译系统 - VibeCoding期末考核项目</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-indicator" id="slideIndicator">1 / 11</div>
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        const slideContainer = document.getElementById('slideContainer');
+        const slideIndicator = document.getElementById('slideIndicator');
+        let currentSlide = 0;
+        const totalSlides = document.querySelectorAll('.slide').length;
+
+        function updateIndicator() { slideIndicator.textContent = `${currentSlide + 1} / ${totalSlides}`; }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                slideContainer.scrollTo({ left: currentSlide * window.innerWidth, behavior: 'smooth' });
+                updateIndicator();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                slideContainer.scrollTo({ left: currentSlide * window.innerWidth, behavior: 'smooth' });
+                updateIndicator();
+            }
+        }
+
+        slideContainer.addEventListener('scroll', () => {
+            currentSlide = Math.round(slideContainer.scrollLeft / window.innerWidth);
+            updateIndicator();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+    </script>
+</body>
+</html>
